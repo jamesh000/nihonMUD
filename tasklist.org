@@ -1,0 +1,10 @@
+#+title: Tasklist and things of that nature
+#+tags: James Isaiah common server client network commands refile
+#+todo: "TODO" "IN PROGRESS" "PAUSED" "BROKEN" | COMPLETE
+
+* Isaiah
+** TODO Pseudocode for the interaction commands :Isaiah:common:commands:
+
+
+* James
+** TODO >???????????

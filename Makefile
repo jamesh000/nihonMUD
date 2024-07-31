@@ -1,17 +1,21 @@
-CC = clang
+CC = g++
 CFLAGS = -c -Wall
 
-all: nmudserver nmudclient
+all: server client
 
-nmudserver:
-	make -C Server
-	cp Server/nmudserver .
+server: object/server.o
+	$(CC) -o $@ $^
 
-nmudclient:
-	make -C Client
-	cp Client/nmudclient .
+client: object/client.o
+	$(CC) -o $@ $^
+
+object/server.o: src/server/server.cpp
+	mkdir -p object
+	$(CC) $(CFLAGS) $< -o $@
+
+object/client.o: src/client/client.cpp
+	mkdir -p object
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	make -C Server clean
-	make -C client clean
-	rm nmudclient nmudserver
+	rm client server object/*	

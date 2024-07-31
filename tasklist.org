@@ -1,10 +1,45 @@
-#+title: Tasklist and things of that nature
-#+tags: James Isaiah common server client network commands refile
-#+todo: "TODO" "IN PROGRESS" "PAUSED" "BROKEN" | COMPLETE
+#+title: Tasklist and things of that nature #+tags: James Isaiah
+common server client network commands refile #+todo: "TODO" "IN
+PROGRESS" "PAUSED" "BROKEN" | COMPLETE
 
 * Isaiah
-** TODO Pseudocode for the interaction commands :Isaiah:common:commands:
+** TODO Pseudocode for the interaction commands
+   :Isaiah:common:commands:
 
 
 * James
 ** TODO >???????????
+
+* Broad Overview of All Computations
+This is more or less everything that needs to be done for things to
+work. Tasks are tagged based on whether server or client side could
+handle them, but are filed under which are planned to handle them. No
+specific implementation details are discussed here.
+** Client Side
+*** Establish a connection with a server                             :client:
+Title
+*** Read User Input                                                  :client:
+User input must be read into the program from stdin. Server cannot
+possibly do this.
+*** Parse User Input into Computer Readable Commands          :client:server:
+User input should be changed from human readable text to a more
+machine friendly format, likely some sort of command object. This can
+be done on either side.
+*** Send Some sort of Command to the Server                          :client:
+Impossible for anything but the client to do. The user's command must
+be communicated to the server in some form.
+*** Parse Information from the Server and Display it into the user
+User needs to be shown what's going on, it is video gaming
+** Server
+*** Listen for User Connections                                      :server:
+Server must be open for connections from user clients. Obviously
+server side task.
+*** Accept User Connections and Handle them somehow                  :server:
+User connections must be remembered accepted and then handled, either
+by having a thread/process for each or using some sort of event
+handling (select, or some library)
+*** Receive and Process User Commands                         :server:
+Commands need to be executed. This is the most complex part, I will
+plan it out by itself sometime.
+*** Send Back New Game State information to Client. :server:
+Clients need to know new game state to inform the user of what's going on.

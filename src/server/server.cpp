@@ -1,43 +1,62 @@
 #include <iostream>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
-#include <sys/types.h>
+#include <arpa/inet.h>
+#include "net.hpp"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    int mainSocket, newSocket;
-    sockaddr_in servAddr{};
-    in_port_t port = 8888;
+    Poller netFds;
 
+    int listener = getListenerFd(8888);
 
-    // Check arguments code will go here
-    // -p [port] plus whatever else we can think of
+    if (listener == -1) {
+        cerr << "Could not create listening port" << endl;
+        exit(1);
+    }
+
+    // For accepting connections
+    int clientFd;
+    sockaddr_storage clientAddr;
+    socklen_t addrLen;
     
-    cout << "Starting server on port " << port << "..." << endl;
+    netFds.addFd(listener, POLLIN);
 
-    mainSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (mainSocket == -1) {
-        perror("Couldn't create socket...");
-        exit(1);
+    for (;;) {
+        int eventCount = netFds.poll(-1);
+        for (int i = 0; i < netFds.count(); i++) {
+            // Found a file descriptor read to read
+            if (netFds[i].revents & POLLIN) {
+                // If the file descriptor is the listener, set up a new connection
+                if (netFds[i].fd == listener) {
+                    
+                    addrLen = sizeof clientAddr;
+                    clientFd = accept(listener, (sockaddr*)&clientAddr, &addrLen);
+                    
+                    if (clientFd == -1)
+                        perror("accept");
+                    else {
+                        netFds.addFd(clientFd, POLLIN);
+                        cout << "New connection from " << getIP((sockaddr*)&clientAddr) << endl;
+                    }
+                } else {
+                    char smolBuffer[100];
+                    int end = recv(netFds[i].fd, smolBuffer, 100, 0);
+                    if (end < 1) {
+                        netFds.delFd(i);
+                    } else {
+                        smolBuffer[end] = 0;
+                        cout << smolBuffer << endl;
+                    }
+                }
+
+                eventCount--;
+                if (eventCount == 0)
+                    break;
+            }
+        }
     }
-    
-    servAddr.sin_family = AF_INET;
-    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servAddr.sin_port = port;
-
-    if (bind(mainSocket, (struct sockaddr*)&servAddr, sizeof(servAddr)) == -1) {
-        perror("Couldn't bind socket...");
-        exit(1);
-    }
-
-    if (listen(mainSocket, 10) == -1) {
-        perror("Failed to listen on socket...");
-        exit(1);
-    }
-
-    // Past this point I will have to decide how I will handle multiple clients which I will do another day (tomorrow)
 
     return 0;
 }

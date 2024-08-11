@@ -9,7 +9,7 @@ int getListenerFd(in_port_t portNo)
     sockaddr_in servAddr{};
     int yes = 1;
 
-    listener = socket(AF_INET, SOCK_STREAM, 0);
+    listener = socket(PF_INET, SOCK_STREAM, 0);
     if (listener == -1) {
         return -1;
     }

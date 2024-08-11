@@ -1,25 +1,39 @@
+# Compilation options
 CC = g++
-CFLAGS = -c -g -Wall
+CFLAGS = -c -Wall
+LIBS = -lcapnp -lkj
+
+# Directories
+ODIR = obj
+SDIR = src
+
+DEPS = $(SDIR)/net.hpp
+
+# Required object files
+OBJ = $(ODIR)/net.o $(ODIR)/serial.capnp.o
+CLIOBJ = $(ODIR)/client.o
+SERVOBJ = $(ODIR)/server.o
 
 all: server client
 
-server: object/server.o object/net.o
-	$(CC) -o $@ $^
+server: $(SERVOBJ) $(OBJ)
+	$(CC) $(LIBS) -o $@ $^
 
-client: object/client.o
-	$(CC) -o $@ $^
+client: $(CLIOBJ) $(OBJ)
+	$(CC) $(LIBS) -o $@ $^
 
-object/server.o: src/server/server.cpp
-	mkdir -p object
+# Object files
+$(CLIOBJ) $(SERVOBJ) $(OBJ): $(ODIR)/%.o: $(SDIR)/%.cpp $(DEPS) objdir
 	$(CC) $(CFLAGS) $< -o $@
 
-object/net.o: src/server/net.cpp src/server/net.hpp
-	mkdir -p object
-	$(CC) $(CFLAGS) $< -o $@
+$(SDIR)/%.capnp.cpp: $(SDIR)/%.capnp.c++
+	mv $< $@
 
-object/client.o: src/client/client.cpp
-	mkdir -p object
-	$(CC) $(CFLAGS) $< -o $@
+$(SDIR)/%.capnp.c++ $(SDIR)/%.capnp.h: $(SDIR)/%.capnp
+	capnp compile -oc++ $<
+
+objdir:
+	mkdir -p $(ODIR)
 
 clean:
-	rm client server object/*	
+	rm -f client server $(ODIR)/* $(SDIR)/*.capnp.*

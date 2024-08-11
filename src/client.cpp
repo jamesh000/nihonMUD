@@ -42,7 +42,9 @@ int main(int argc, char *argv[])
         string buffer;
         getline(cin, buffer);
 
-        send(serverSock, buffer.c_str(), buffer.length(), 0);
+        int bytesSent = send(serverSock, buffer.c_str(), buffer.length(), 0);
+        if (bytesSent == -1)
+            perror("send");
     }
     
     return 0;

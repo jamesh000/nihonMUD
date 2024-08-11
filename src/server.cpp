@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
                         cout << "New connection from " << getIP((sockaddr*)&clientAddr) << endl;
                     }
                 } else {
+                    // This is where game logic would take place
                     char smolBuffer[100];
                     int end = recv(netFds[i].fd, smolBuffer, 100, 0);
                     if (end < 1) {

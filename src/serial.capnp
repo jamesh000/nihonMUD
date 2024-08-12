@@ -1,18 +1,25 @@
 @0xa44026b503cc347b;
 
 struct Command {
-  enum Action {
+  predicate @0 :Type;
+  
+  enum Type {
     go @0;
     talk @1;
     attack @2;
     buy @3;
     sell @4;
   }
+
+  subject @1 :UInt32;
   
-  amount @0 :UInt32;
+  amount :union {
+   none @2 :Void;
+   num @3 :UInt32;
+  }
   
-  union {
-    empty @1 :Void;
-    weapon @2 :Text;
+  preposition :union {
+    none @4 :Void;
+    weapon @5 :Text;
   }
 }

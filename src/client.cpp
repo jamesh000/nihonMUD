@@ -5,6 +5,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <capnp/message.h>
+#include <capnp/serialize.h>
+#include "serial.capnp.h"
 
 using namespace std;
 
@@ -39,12 +42,18 @@ int main(int argc, char *argv[])
 
     // game loop
     for (;;) {
+        capnp::MallocMessageBuilder message;
+        Command::Builder userCmd = message.initRoot<Command>();
+        
         string buffer;
         getline(cin, buffer);
+        
+        userCmd.setPredicate(::Command::Type::GO);
+        userCmd.setSubject(10);
+        userCmd.getAmount().setNone();
+        userCmd.getPreposition().setNone();
 
-        int bytesSent = send(serverSock, buffer.c_str(), buffer.length(), 0);
-        if (bytesSent == -1)
-            perror("send");
+        capnp::writeMessageToFd(serverSock, message);
     }
     
     return 0;

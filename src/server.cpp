@@ -3,6 +3,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "net.hpp"
+#include <capnp/message.h>
+#include <capnp/serialize.h>
+#include "serial.capnp.h"
 
 using namespace std;
 
@@ -41,15 +44,19 @@ int main(int argc, char *argv[]) {
                         cout << "New connection from " << getIP((sockaddr*)&clientAddr) << endl;
                     }
                 } else {
-                    // This is where game logic would take place
-                    char smolBuffer[100];
-                    int end = recv(netFds[i].fd, smolBuffer, 100, 0);
-                    if (end < 1) {
-                        netFds.delFd(i);
-                    } else {
-                        smolBuffer[end] = 0;
-                        cout << smolBuffer << endl;
+                    // Read in the message
+                    capnp::StreamFdMessageReader message(netFds[i].fd);
+                    Command::Reader userCmd = message.getRoot<Command>();
+                    
+                    // This is where the 
+                    switch (userCmd.getPredicate()) {
+                    case ::Command::Type::GO: cout << "go "; break;
+                    case ::Command::Type::ATTACK: cout << "attack "; break;
+                    case ::Command::Type::TALK: cout << "attack "; break;
+                    case ::Command::Type::BUY: cout << "buy "; break;
+                    case ::Command::Type::SELL: cout << "sell "; break;
                     }
+                    cout << userCmd.getSubject() << endl;
                 }
 
                 eventCount--;
